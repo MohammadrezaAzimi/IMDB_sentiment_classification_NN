@@ -1,139 +1,25 @@
 # IMDB_sentiment_classification_NN
 
-# Loading the IMDB dataset and only keeping the top 10000 most frequently occurring words 
+# Project description: In this project, there are 25000 highly polar movie reviews to construct training and development (hold-out) sets. The first 10000 reviews are kept as the development set while the rest is used for training set. There is an additional test set of 25000 reviews.
 
-import numpy as np
-from keras.datasets import imdb
-(train_data, train_labels), (test_data, test_labels) = imdb.load_data(
-    num_words=10000)
+# Network model: A three-layer neural network is used. The network is comprised of two fully-connected layers with 16 hidden units and rectified linear unit (ReLU) activation as well as the output layer with sigmoid activation that classifies the reviews as positive or negative.
 
-# dictionary mapping words to an integer index
+# Details: Optimization of stochastic gradient descent algorithm is done using RMSProp. Accuracy is performance metric and binary cross_entropy is the loss function.
 
-word_index = imdb.get_word_index() 
+1. Only 10000 most frequently words in the training set are kept.
 
-# mapping integer indices to words 
-reverse_word_index = dict([(value, key) for (key, value) in word_index.items()]) 
+2. Using Python code imdb.get_word_index() words are mapped to integer indices. Then a dictionary is constructed using dict(). 
 
-# Decoding the review by noting that the indices are offset by 3 because 0, 1, and 2 are reserved indices for “padding,” “start of sequence,” and “unknown.”
+3. To prepare the data, integer indices are transformed to tensors using one-hot encoding.
 
-decoded_review = ' '.join([reverse_word_index.get(i - 3, '?') for i in train_data[0]])
+4.  The batch size is equal to 512 and then fitted the training data to the model over 20 epochs. 
 
-# Encoding the integer sequences into a binary matrix
+# Modification:
+1. To combat the overfitting problem, L2 regularization is used with weight coefficient . The entire 25000 reviews are used for training and then the resulting trained model is evaluated on the test set of 25000 reviews. The accuracy for the test set is 0.92 after 4 epochs.
 
-def vectorize_sequences(sequences, dimension=10000):
-    results = np.zeros((len(sequences), dimension))
-    for i, sequence in enumerate(sequences):
-          results[i, sequence] = 1.
-    return results
-    
-x_train = vectorize_sequences(train_data)
-x_test = vectorize_sequences(test_data)
+2. As another approach to overcome overfitting problem, dropout regularization is used. The training, development and test tests are defined in the same way as original problem. The probability that each unit is kept is equal to 0.5.
 
-# Vectorizing the labels
-
-y_train = np.asarray(train_labels).astype('float32')
-y_test = np.asarray(test_labels).astype('float32')
-
-# Defining the model as two fully connected layers and a final output layer with sigmoid activation 
-
-
-from keras import models
-from keras import layers
-model = models.Sequential()
-model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
-model.add(layers.Dense(16, activation='relu'))
-model.add(layers.Dense(1, activation='sigmoid'))
-
-# Separating the training and hold-out data points and labels  
-
-x_val = x_train[:10000]
-partial_x_train = x_train[10000:]
-y_val = y_train[:10000]
-partial_y_train = y_train[10000:]
-
-model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=['acc'])
-
-# Fitting data to the model 
-
-history = model.fit(partial_x_train,partial_y_train,epochs=20,batch_size=512,validation_data=(x_val, y_val))
-
-history_dict = history.history
-history_dict.keys()
-
-# Plotting the training and validation losses 
-
-import matplotlib.pyplot as plt
-history_dict = history.history
-loss_values = history_dict['loss']
-val_loss_values = history_dict['val_loss']
-epochs = range(1, 20 + 1)
-plt.plot(epochs, loss_values, 'bo', label='Training loss')
-plt.plot(epochs, val_loss_values, 'b', label='Validation loss')
-plt.title('Training and validation loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
-
-# Plotting the training and validation accuracies 
-
-
-plt.clf() 
-acc_values = history_dict['acc'] 
-val_acc_values = history_dict['val_acc']
-plt.plot(epochs, acc_values, 'bo', label='Training acc') # bo is for blue dot 
-plt.plot(epochs, val_acc_values, 'b', label='Validation acc') # b is solid blue line 
-plt.title('Training and validation accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
-
-# Adding L2 regularization to combat overfitting   
-
-from keras import regularizers
-
-model = models.Sequential()
-model.add(layers.Dense(16, kernel_regularizer=regularizers.l2(0.001), activation='relu', input_shape=(10000,)))
-model.add(layers.Dense(16, kernel_regularizer=regularizers.l2(0.001), activation='relu'))
-model.add(layers.Dense(1, activation='sigmoid'))
-model.compile(optimizer='rmsprop',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=4, batch_size=512)
-results = model.evaluate(x_test, y_test)
-
-# Or adding dropout regularization to combat overfitting 
-
-model = models.Sequential()
-model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
-model.add(layers.Dropout(0.5))
-model.add(layers.Dense(16, activation='relu'))
-model.add(layers.Dropout(0.5))
-model.add(layers.Dense(1, activation='sigmoid'))
-model.compile(optimizer='rmsprop',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
-history = model.fit(partial_x_train,partial_y_train,epochs=20,batch_size=512,validation_data=(x_val, y_val))
-history_dict = history.history
-history_dict.keys()
-
-# Plotting the training and validation losses 
-
-import matplotlib.pyplot as plt
-history_dict = history.history
-loss_values = history_dict['loss']
-val_loss_values = history_dict['val_loss']
-epochs = range(1, 20 + 1)
-plt.plot(epochs, loss_values, 'bo', label='Training loss')
-plt.plot(epochs, val_loss_values, 'b', label='Validation loss')
-plt.title('Training and validation loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
-
-
+Interested reader is referred to the book Deep Learning with Python by Francois Chollet.
 
 
 
