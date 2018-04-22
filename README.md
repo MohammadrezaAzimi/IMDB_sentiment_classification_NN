@@ -1,10 +1,13 @@
 # IMDB_sentiment_classification_NN
 
-# Project description: In this project, there are 25000 highly polar movie reviews to construct training and development (hold-out) sets. The first 10000 reviews are kept as the development set while the rest is used for training set. There is an additional test set of 25000 reviews.
+# Project description: 
+In this project, there are 25000 highly polar movie reviews to construct training and development (hold-out) sets. The first 10000 reviews are kept as the development set while the rest is used for training set. There is an additional test set of 25000 reviews.
 
-# Network model: A three-layer neural network is used. The network is comprised of two fully-connected layers with 16 hidden units and rectified linear unit (ReLU) activation as well as the output layer with sigmoid activation that classifies the reviews as positive or negative.
+# Network model: 
+A three-layer neural network is used. The network is comprised of two fully-connected layers with 16 hidden units and rectified linear unit (ReLU) activation as well as the output layer with sigmoid activation that classifies the reviews as positive or negative.
 
-# Details: Optimization of stochastic gradient descent algorithm is done using RMSProp. Accuracy is performance metric and binary cross_entropy is the loss function.
+# Details: 
+Optimization of stochastic gradient descent algorithm is done using RMSProp. Accuracy is performance metric and binary cross_entropy is the loss function.
 
 1. Only 10000 most frequently words in the training set are kept.
 
